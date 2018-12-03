@@ -79,7 +79,7 @@ def update(i): #Pobiera nową wartość smogu, ponownie stosuje algorytm Kriging
 def readcsv(filename):
     results = []
     with open(filename) as csvfile:
-        reader = csv.reader(csvfile, delimiter = ",")
+        reader = csv.reader(csvfile, delimiter = ";")
         for row in reader:
             results.append(row)
         for i in range(0, len(results)):
