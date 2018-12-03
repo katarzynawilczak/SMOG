@@ -70,11 +70,10 @@ def update(i): #Pobiera nową wartość smogu, ponownie stosuje algorytm Kriging
     v = updateV()
     grid = np.zeros((75,60),dtype='float32') 
     grid = SimpleKriging(x,y,v,(50,30),grid)
-    plt.imshow(grid.T,origin='lower',interpolation='nearest',cmap='jet')
-    plt.scatter(x,y,c=v,cmap='jet',s=120)
+    plt.imshow(grid.T,origin='lower',interpolation='gaussian',cmap='jet')
+    plt.scatter(x,y,c=v,cmap='jet')
     plt.xlim(0,grid.shape[0])
     plt.ylim(0,grid.shape[1])
-    #plt.grid()
 
 
 def readcsv(filename):
@@ -83,16 +82,17 @@ def readcsv(filename):
         reader = csv.reader(csvfile, delimiter = ",")
         for row in reader:
             results.append(row)
-        for i in range(0, 13):
+        for i in range(0, len(results)):
             for j in range(0, 11):
                 results[i][j] = int(results[i][j])
     return results;
 
 def main():
     global results
-    results = readcsv("sensors.csv")
+    results = readcsv("pm10_dzien.csv")  #zmiana pliku z danymi pomiarowymi
     fig = plt.figure()
-    ani = FuncAnimation(fig, update, frames = 12, interval=100, repeat = False) #uruchomienie animacji, (dostaniemy 12+1 map)
+    plt.grid()
+    ani = FuncAnimation(fig, update, frames = 24, interval=100, repeat = False) #uruchomienie animacji, frames = 12 (dla kilku dni) lub frames=24 (dla jednego dnia)
     plt.show()
         
 
