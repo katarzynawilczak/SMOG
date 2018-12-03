@@ -4,9 +4,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.linalg as LA
 from matplotlib.animation import FuncAnimation
+import csv
 
 
+#globalne:
+results= []
+rownum =0
 
+   
 #algorytm SimpleKriging
 #zrodło: https://sourceforge.net/p/geoms2/wiki/Kriging/
 
@@ -52,28 +57,42 @@ def retY(): #Zwraca punkty pomiarowe  a osi y
     return y
 
 def updateV(): #updatuje nowe wartosci smogu
-    #v = array([94, 61, 81, 70, 76, 78, 97, 70, 74, 63, 67]) #PM10 20.11 g.21.00
-    v = np.random.randint(0,100,11)  #dla losowych
-    return v  
+    #v = np.random.randint(0,100,11)  #dla losowych
+    global results
+    global rownum
+    v = results[rownum]
+    rownum +=1
+    return array(v)  
     
-def update(aC): #Pobiera nową wartość smogu, ponownie stosuje algorytm Kriging i rysuje nowy wykres
+def update(i): #Pobiera nową wartość smogu, ponownie stosuje algorytm Kriging i rysuje nowy wykres
     x=retX()
     y=retY()
     v = updateV()
     grid = np.zeros((75,60),dtype='float32') 
     grid = SimpleKriging(x,y,v,(50,30),grid)
-    plt.imshow(grid.T,origin='lower',interpolation='gaussian',cmap='jet')
+    plt.imshow(grid.T,origin='lower',interpolation='nearest',cmap='jet')
     plt.scatter(x,y,c=v,cmap='jet',s=120)
     plt.xlim(0,grid.shape[0])
     plt.ylim(0,grid.shape[1])
-    plt.grid()
-    
+    #plt.grid()
 
+
+def readcsv(filename):
+    results = []
+    with open(filename) as csvfile:
+        reader = csv.reader(csvfile, delimiter = ",")
+        for row in reader:
+            results.append(row)
+        for i in range(0, 13):
+            for j in range(0, 11):
+                results[i][j] = int(results[i][j])
+    return results;
 
 def main():
+    global results
+    results = readcsv("sensors.csv")
     fig = plt.figure()
-    ani = FuncAnimation(fig, update, interval=3, save_count=3) #uruchomienie animacji
-    #jak zrobic zeby nie byla powtarzana w nieskonczonosc?
+    ani = FuncAnimation(fig, update, frames = 12, interval=100, repeat = False) #uruchomienie animacji, (dostaniemy 12+1 map)
     plt.show()
         
 
