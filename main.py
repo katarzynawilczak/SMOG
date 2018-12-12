@@ -1,5 +1,5 @@
-from __future__ import division 
-from pylab import *
+#from __future__ import division 
+#from pylab import *
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.linalg as LA
@@ -50,10 +50,10 @@ def SimpleKriging(x,y,v,variogram,grid):
     return grid
 
 def retX(): #Zwraca punkty pomiarowe na osi x (przyblizone wartosci)
-    x = array([58, 58, 57, 47, 50, 40, 43, 34, 20, 24, 17])
+    x = np.array([58, 58, 57, 47, 50, 40, 43, 34, 20, 24, 17])
     return x
 def retY(): #Zwraca punkty pomiarowe  a osi y
-    y = array([50, 42, 25, 24, 20, 21, 17, 33, 34, 38, 25])
+    y = np.array([50, 42, 25, 24, 20, 21, 17, 33, 34, 38, 25])
     return y
 
 def updateV(): #updatuje nowe wartosci smogu
@@ -62,7 +62,7 @@ def updateV(): #updatuje nowe wartosci smogu
     global rownum
     v = results[rownum]
     rownum +=1
-    return array(v)  
+    return np.array(v)  
     
 def update(i): #Pobiera nową wartość smogu, ponownie stosuje algorytm Kriging i rysuje nowy wykres
     x=retX()
