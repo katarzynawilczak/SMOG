@@ -1,5 +1,5 @@
-#from __future__ import division 
-#from pylab import *
+from __future__ import division 
+from pylab import *
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.linalg as LA
@@ -10,6 +10,10 @@ import csv
 #globalne:
 results= []
 rownum =0
+czynnikiAtm=[]
+wind=[]
+fig=plt.figure()
+img = plt.imread("krk_color_scaled.jpg") 
 
    
 #algorytm SimpleKriging
@@ -50,10 +54,10 @@ def SimpleKriging(x,y,v,variogram,grid):
     return grid
 
 def retX(): #Zwraca punkty pomiarowe na osi x (przyblizone wartosci)
-    x = np.array([58, 58, 57, 47, 50, 40, 43, 34, 20, 24, 17])
+    x = array([58, 58, 57, 47, 50, 40, 43, 34, 20, 24, 17])
     return x
 def retY(): #Zwraca punkty pomiarowe  a osi y
-    y = np.array([50, 42, 25, 24, 20, 21, 17, 33, 34, 38, 25])
+    y = array([50, 42, 25, 24, 20, 21, 17, 33, 34, 38, 25])
     return y
 
 def updateV(): #updatuje nowe wartosci smogu
@@ -62,18 +66,32 @@ def updateV(): #updatuje nowe wartosci smogu
     global rownum
     v = results[rownum]
     rownum +=1
-    return np.array(v)  
+    return array(v)  
     
 def update(i): #Pobiera nową wartość smogu, ponownie stosuje algorytm Kriging i rysuje nowy wykres
+    global img, fig, czynnikiAtm
     x=retX()
     y=retY()
     v = updateV()
+    fig.clf()
+    plt.imshow(img, extent=[0, 75, 0, 60])
     grid = np.zeros((75,60),dtype='float32') 
     grid = SimpleKriging(x,y,v,(50,30),grid)
-    plt.imshow(grid.T,origin='lower',interpolation='gaussian',cmap='jet')
+    plt.imshow(grid.T,origin='lower', interpolation='gaussian',cmap='jet', alpha=0.5)
     plt.scatter(x,y,c=v,cmap='jet')
     plt.xlim(0,grid.shape[0])
     plt.ylim(0,grid.shape[1])
+
+    plt.gcf().text(0.02, 0.9, "Temperature:  "\
+            +czynnikiAtm[i+1][0]+"\N{DEGREE SIGN}C", fontsize=14)
+    plt.gcf().text(0.02, 0.85, "Wind:  "+czynnikiAtm[i+1][1]\
+            +"kt "+czynnikiAtm[i+1][2], fontsize=14)
+    plt.gcf().text(0.02, 0.8, "Precipitation:  "+czynnikiAtm[i+1][3]\
+            +"mm", fontsize=14)
+    plt.gcf().text(0.02, 0.75, "Air humidity:  "+czynnikiAtm[i+1][4]\
+            +"%", fontsize=14)
+    plt.gcf().text(0.02, 0.7, "Air pressure:  "\
+            +czynnikiAtm[i+1][5]+"hPa", fontsize=14)
 
 
 def readcsv(filename):
@@ -82,17 +100,20 @@ def readcsv(filename):
         reader = csv.reader(csvfile, delimiter = ";")
         for row in reader:
             results.append(row)
-        for i in range(0, len(results)):
-            for j in range(0, 11):
-                results[i][j] = int(results[i][j])
     return results;
 
 def main():
-    global results
+    global results, czynnikiAtm
     results = readcsv("pm10_dzien.csv")  #zmiana pliku z danymi pomiarowymi
-    fig = plt.figure()
+    
+    for i in range(0, len(results)):
+        for j in range (0,11):
+            results[i][j]=int(results[i][j])
+    czynnikiAtm = readcsv("warunki_tydzien.csv")
     plt.grid()
-    ani = FuncAnimation(fig, update, frames = 24, interval=100, repeat = False) #uruchomienie animacji, frames = 12 (dla kilku dni) lub frames=24 (dla jednego dnia)
+    
+    
+    ani = FuncAnimation(fig, update, frames = 12, interval=100, repeat = False) #uruchomienie animacji, frames = 12 (dla kilku dni) lub frames=24 (dla jednego dnia)
     plt.show()
         
 
