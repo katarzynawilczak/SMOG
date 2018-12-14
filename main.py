@@ -13,7 +13,11 @@ rownum =0
 czynnikiAtm=[]
 wind=[]
 fig=plt.figure()
+<<<<<<< HEAD
 img = plt.imread("krk_color_scaled.png") 
+=======
+img = plt.imread("krk_color_scaled.jpg") 
+>>>>>>> upstream/master
 
    
 #algorytm SimpleKriging
@@ -68,7 +72,11 @@ def updateV(): #updatuje nowe wartosci smogu
     rownum +=1
     return array(v)  
     
+<<<<<<< HEAD
 def update(i): #Pobiera nowa wartosc smogu, ponownie stosuje algorytm Kriging i rysuje nowy wykres
+=======
+def update(i): #Pobiera nową wartość smogu, ponownie stosuje algorytm Kriging i rysuje nowy wykres
+>>>>>>> upstream/master
     global img, fig, czynnikiAtm
     x=retX()
     y=retY()
