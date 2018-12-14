@@ -13,11 +13,11 @@ rownum =0
 czynnikiAtm=[]
 wind=[]
 fig=plt.figure()
-img = plt.imread("krk_color_scaled.jpg") 
+img = plt.imread("krk_color_scaled.png") 
 
    
 #algorytm SimpleKriging
-#zrodło: https://sourceforge.net/p/geoms2/wiki/Kriging/
+#zrodlo: https://sourceforge.net/p/geoms2/wiki/Kriging/
 
 #1) Check the distance between node and samples.
 #2) Check the angle between node and sample.
@@ -68,7 +68,7 @@ def updateV(): #updatuje nowe wartosci smogu
     rownum +=1
     return array(v)  
     
-def update(i): #Pobiera nową wartość smogu, ponownie stosuje algorytm Kriging i rysuje nowy wykres
+def update(i): #Pobiera nowa wartosc smogu, ponownie stosuje algorytm Kriging i rysuje nowy wykres
     global img, fig, czynnikiAtm
     x=retX()
     y=retY()
