@@ -5,12 +5,18 @@ Created on Fri Dec 14 14:23:26 2018
 
 @author: hushmans
 """
-import Tkinter as tk #do gui
-
+import tkinter as tk #do gui
+import main
 
 class Picker(tk.Frame):
+
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
+
+        def simulation():
+            root.destroy()
+            main.main()
+
 
         #tworzy przyciski wyboru i prompty
         
@@ -26,7 +32,7 @@ class Picker(tk.Frame):
         self.hour = tk.Radiobutton(self, text="24h", variable=timeR, value=24)
         self.week = tk.Radiobutton(self, text="Week", variable=timeR, value=7)
         
-        self.start = tk.Button(self, text="Start simulation")
+        self.start = tk.Button(self, text="Start simulation", command=simulation)
 
         #ustawia elementy w oknie 
         self.prompt.pack(side="top", fill="x")
@@ -38,7 +44,8 @@ class Picker(tk.Frame):
         self.week.pack(side="top")
         
         self.start.pack()
-        
+
+
 if __name__ == "__main__":
     root = tk.Tk()
     root.title("Air Pollution Simulation")
