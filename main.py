@@ -82,15 +82,15 @@ def update(i): #Pobiera nowa wartosc smogu, ponownie stosuje algorytm Kriging i 
     plt.xlim(0,grid.shape[0])
     plt.ylim(0,grid.shape[1])
 
-    plt.gcf().text(0.02, 0.9, "Temperature:  "\
+    plt.gcf().text(0.02, 0.95, "Temperature:  "\
             +czynnikiAtm[i+1][0]+"\N{DEGREE SIGN}C", fontsize=14)
-    plt.gcf().text(0.02, 0.85, "Wind:  "+czynnikiAtm[i+1][1]\
+    plt.gcf().text(0.40, 0.95, "Wind:  "+czynnikiAtm[i+1][1]\
             +"kt "+czynnikiAtm[i+1][2], fontsize=14)
-    plt.gcf().text(0.02, 0.8, "Precipitation:  "+czynnikiAtm[i+1][3]\
+    plt.gcf().text(0.65, 0.95, "Precipitation:  "+czynnikiAtm[i+1][3]\
             +"mm", fontsize=14)
-    plt.gcf().text(0.02, 0.75, "Air humidity:  "+czynnikiAtm[i+1][4]\
+    plt.gcf().text(0.20, 0.9, "Air humidity:  "+czynnikiAtm[i+1][4]\
             +"%", fontsize=14)
-    plt.gcf().text(0.02, 0.7, "Air pressure:  "\
+    plt.gcf().text(0.58, 0.9, "Air pressure:  "\
             +czynnikiAtm[i+1][5]+"hPa", fontsize=14)
 
 
@@ -103,7 +103,7 @@ def readcsv(filename):
     return results;
 
 def main():
-    global results, czynnikiAtm
+    global results, czynnikiAtm, fig
     results = readcsv("pm10_dzien.csv")  #zmiana pliku z danymi pomiarowymi
     
     for i in range(0, len(results)):
@@ -115,8 +115,7 @@ def main():
     
     ani = FuncAnimation(fig, update, frames = 12, interval=100, repeat = False) #uruchomienie animacji, frames = 12 (dla kilku dni) lub frames=24 (dla jednego dnia)
     plt.show()
-        
-
+    plt.close(fig)
 
 if __name__ == "__main__":
     main()
