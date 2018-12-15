@@ -2,6 +2,8 @@ from __future__ import division
 from pylab import *
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.colors import LinearSegmentedColormap
+import matplotlib as mpl
 import scipy.linalg as LA
 from matplotlib.animation import FuncAnimation
 import csv
@@ -73,12 +75,34 @@ def update(i): #Pobiera nowa wartosc smogu, ponownie stosuje algorytm Kriging i 
     x=retX()
     y=retY()
     v = updateV()
+
+
+    cdict = {'red':   ((0.0, 0.0, 0.0),
+                   (0.167, 1.0, 1.0),
+                   (0.5, 1.0, 1.0),
+                   (0.67, 1.0, 1.0),
+                   (1.0, 0.5, 0.5)),
+         'green': ((0.0, 1.0, 1.0),
+                   (0.167, 1.0, 1.0),
+                   (0.5, 0.5, 0.5),
+                   (0.67, 0.0, 0.0),
+                   (1.0, 0.0, 0.0)),
+         'blue':  ((0.0, 0.0, 0.0),
+                   (0.167, 0.0, 0.0),
+                   (0.5, 0.0, 0.0),
+                   (0.67, 0.0, 0.0),
+                   (1.0, 0.7, 0.7)) }
+
+    smogColorMap = LinearSegmentedColormap('SmogColorMap', cdict)
+    
     fig.clf()
     plt.imshow(img, extent=[0, 75, 0, 60])
     grid = np.zeros((75,60),dtype='float32') 
     grid = SimpleKriging(x,y,v,(50,30),grid)
-    plt.imshow(grid.T,origin='lower', interpolation='gaussian',cmap='jet', alpha=0.5)
-    plt.scatter(x,y,c=v,cmap='jet')
+    plt.imshow(grid.T,origin='lower', interpolation='gaussian',cmap=smogColorMap, alpha=0.5)
+    scatter = plt.scatter(x,y,c=v,cmap=smogColorMap, vmin=0, vmax=300)
+    cb = plt.colorbar(scatter, fraction=0.035, pad=0.04)
+    cb.set_label('Wartości smogu')
     plt.xlim(0,grid.shape[0])
     plt.ylim(0,grid.shape[1])
 
@@ -112,8 +136,8 @@ def main():
     czynnikiAtm = readcsv("warunki_tydzien.csv")
     plt.grid()
     
-    
     ani = FuncAnimation(fig, update, frames = 12, interval=100, repeat = False) #uruchomienie animacji, frames = 12 (dla kilku dni) lub frames=24 (dla jednego dnia)
+    
     plt.show()
     plt.close(fig)
 
