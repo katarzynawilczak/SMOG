@@ -150,7 +150,7 @@ def main(pm,okres):
         frames=24
     plt.grid()
     
-    ani = FuncAnimation(fig, update, frames = frames, interval=100, repeat = False) #uruchomienie animacji, frames = 12 (dla kilku dni) lub frames=24 (dla jednego dnia)
+    ani = FuncAnimation(fig, update, frames = frames, interval=300, repeat = False) #uruchomienie animacji, frames = 12 (dla kilku dni) lub frames=24 (dla jednego dnia)
     
     plt.show()
     plt.close(fig)
