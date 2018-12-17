@@ -21,15 +21,6 @@ img = plt.imread("krk_color_scaled.png")
 #algorytm SimpleKriging
 #zrodlo: https://sourceforge.net/p/geoms2/wiki/Kriging/
 
-#1) Check the distance between node and samples.
-#2) Check the angle between node and sample.
-#3) Calculate the M array for variogram values between node and sample.
-#4) Get the K matrix with the variogram values of all points envolved.
-#5) Solve the system K*w=M. This will give you the weights.
-#6) Multiply the weights by the result beetween values minus the mean of values (it could be an user input). Sum the result.
-#7) Subtract the mean of values to that sum and you have the value for the node.
-#8) Repeat the steps for all nodes.
-
 def SimpleKriging(x,y,v,variogram,grid):
 
     cov_angles = np.zeros((x.shape[0],x.shape[0]))
@@ -75,8 +66,31 @@ def update(i): #Pobiera nowa wartosc smogu, ponownie stosuje algorytm Kriging i 
     x=retX()
     y=retY()
     v = updateV()
+    smogColorMap = newColorMap()
+    fig.clf()
+    plt.imshow(img, extent=[0, 75, 0, 60])
+    grid = np.zeros((75,60),dtype='float32') 
+    grid = SimpleKriging(x,y,v,(50,30),grid)
+    plt.imshow(grid.T,origin='lower', interpolation='gaussian',cmap=smogColorMap, alpha=0.5, vmin=0, vmax=300)
+    scatter = plt.scatter(x,y,c=v,cmap=smogColorMap, vmin=0, vmax=300)
+    cb = plt.colorbar(scatter, fraction=0.035, pad=0.04)
+    cb.set_label('SMOG scale')
+    plt.xlim(0,grid.shape[0])
+    plt.ylim(0,grid.shape[1])
 
+    plt.gcf().text(0.02, 0.95, "Temperature:  "\
+            +czynnikiAtm[i+1][0]+"\N{DEGREE SIGN}C", fontsize=14)
+    plt.gcf().text(0.40, 0.95, "Wind:  "+czynnikiAtm[i+1][1]\
+            +"kt "+czynnikiAtm[i+1][2], fontsize=14)
+    plt.gcf().text(0.65, 0.95, "Precipitation:  "+czynnikiAtm[i+1][3]\
+            +"mm", fontsize=14)
+    plt.gcf().text(0.20, 0.9, "Air humidity:  "+czynnikiAtm[i+1][4]\
+            +"%", fontsize=14)
+    plt.gcf().text(0.58, 0.9, "Air pressure:  "\
+            +czynnikiAtm[i+1][5]+"hPa", fontsize=14)
+    #plt.gcf().text(0.1, 0.03, "Numer ramki:  "\+str(i), fontsize=11)
 
+def newColorMap():
     cdict = {'red':   ((0.0, 0.0, 0.0),
                    (0.167, 1.0, 1.0),
                    (0.5, 1.0, 1.0),
@@ -92,31 +106,8 @@ def update(i): #Pobiera nowa wartosc smogu, ponownie stosuje algorytm Kriging i 
                    (0.5, 0.0, 0.0),
                    (0.67, 0.0, 0.0),
                    (1.0, 0.7, 0.7)) }
-
     smogColorMap = LinearSegmentedColormap('SmogColorMap', cdict)
-    
-    fig.clf()
-    plt.imshow(img, extent=[0, 75, 0, 60])
-    grid = np.zeros((75,60),dtype='float32') 
-    grid = SimpleKriging(x,y,v,(50,30),grid)
-    plt.imshow(grid.T,origin='lower', interpolation='gaussian',cmap=smogColorMap, alpha=0.5)
-    scatter = plt.scatter(x,y,c=v,cmap=smogColorMap, vmin=0, vmax=300)
-    cb = plt.colorbar(scatter, fraction=0.035, pad=0.04)
-    cb.set_label('Wartości smogu')
-    plt.xlim(0,grid.shape[0])
-    plt.ylim(0,grid.shape[1])
-
-    plt.gcf().text(0.02, 0.95, "Temperature:  "\
-            +czynnikiAtm[i+1][0]+"\N{DEGREE SIGN}C", fontsize=14)
-    plt.gcf().text(0.40, 0.95, "Wind:  "+czynnikiAtm[i+1][1]\
-            +"kt "+czynnikiAtm[i+1][2], fontsize=14)
-    plt.gcf().text(0.65, 0.95, "Precipitation:  "+czynnikiAtm[i+1][3]\
-            +"mm", fontsize=14)
-    plt.gcf().text(0.20, 0.9, "Air humidity:  "+czynnikiAtm[i+1][4]\
-            +"%", fontsize=14)
-    plt.gcf().text(0.58, 0.9, "Air pressure:  "\
-            +czynnikiAtm[i+1][5]+"hPa", fontsize=14)
-
+    return smogColorMap
 
 def readcsv(filename):
     results = []
@@ -126,21 +117,44 @@ def readcsv(filename):
             results.append(row)
     return results;
 
-def main():
+def matrixToInt(matrix):
+    newMatrix=[[0]*len(matrix[0]) for i in range(len(matrix))]
+    for i in range(0, len(matrix)):
+        for j in range (0, len(matrix[0])):
+            newMatrix[i][j]=int(matrix[i][j])
+    return newMatrix
+
+def main(pm,okres):
     global results, czynnikiAtm, fig
-    results = readcsv("pm10_dzien.csv")  #zmiana pliku z danymi pomiarowymi
+
+    if okres==7 and pm==10:
+        results = readcsv("pm10_tydzien.csv")  #zmiana pliku z danymi pomiarowymi
+        print("okres = 7 tydzien, pm = 10")
+    elif okres==7 and pm==25:
+        results = readcsv("pm25_tydzien.csv")
+        print("okres = 7 tydzien, pm = 2.5")
+    elif okres==24 and pm==10:
+        results = readcsv("pm10_dzien.csv")
+        print("okres = 24 dzien, pm = 10")
+    elif okres==24 and pm==25:
+        results = readcsv("pm25_dzien.csv")
+        print("okres = 24 dzien, pm = 2.5")
     
-    for i in range(0, len(results)):
-        for j in range (0,11):
-            results[i][j]=int(results[i][j])
-    czynnikiAtm = readcsv("warunki_tydzien.csv")
+    results = matrixToInt(results);
+
+    if okres == 7:
+        czynnikiAtm = readcsv("warunki_tydzien.csv")
+        frames=12
+    else:
+        czynnikiAtm = readcsv("warunki_dzien.csv")
+        frames=24
     plt.grid()
     
-    ani = FuncAnimation(fig, update, frames = 12, interval=100, repeat = False) #uruchomienie animacji, frames = 12 (dla kilku dni) lub frames=24 (dla jednego dnia)
+    ani = FuncAnimation(fig, update, frames = frames, interval=100, repeat = False) #uruchomienie animacji, frames = 12 (dla kilku dni) lub frames=24 (dla jednego dnia)
     
     plt.show()
     plt.close(fig)
 
-if __name__ == "__main__":
-    main()
+#if __name__ == "__main__":
+#    main()
 
