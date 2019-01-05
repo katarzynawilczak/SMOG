@@ -7,6 +7,7 @@ import matplotlib as mpl
 import scipy.linalg as LA
 from matplotlib.animation import FuncAnimation
 import csv
+import propagation
 
 
 #globalne:
@@ -15,7 +16,7 @@ rownum =0
 czynnikiAtm=[]
 wind=[]
 fig=plt.figure()
-img = plt.imread("krk_color_scaled.png") 
+img = plt.imread('../images/krk_color_scaled.png') 
 
    
 #algorytm SimpleKriging
@@ -90,6 +91,23 @@ def update(i): #Pobiera nowa wartosc smogu, ponownie stosuje algorytm Kriging i 
             +czynnikiAtm[i+1][5]+"hPa", fontsize=14)
     #plt.gcf().text(0.1, 0.03, "Numer ramki:  "\+str(i), fontsize=11)
 
+def updateSim(i): #Pobiera nowa wartosc smogu, ponownie stosuje algorytm Kriging i rysuje nowy wykres
+    global img, fig, czynnikiAtm
+    x=retX()
+    y=retY()
+    v = updateV()
+    smogColorMap = newColorMap()
+    fig.clf()
+    plt.imshow(img, extent=[0, 75, 0, 60])
+    grid = np.zeros((75,60),dtype='float32') 
+    grid = SimpleKriging(x,y,v,(50,30),grid)
+    plt.imshow(grid.T,origin='lower', interpolation='gaussian',cmap=smogColorMap, alpha=0.5, vmin=0, vmax=300)
+    scatter = plt.scatter(x,y,c=v,cmap=smogColorMap, vmin=0, vmax=300)
+    cb = plt.colorbar(scatter, fraction=0.035, pad=0.04)
+    cb.set_label('SMOG scale')
+    plt.xlim(0,grid.shape[0])
+    plt.ylim(0,grid.shape[1])
+
 def newColorMap():
     cdict = {'red':   ((0.0, 0.0, 0.0),
                    (0.167, 1.0, 1.0),
@@ -124,29 +142,57 @@ def matrixToInt(matrix):
             newMatrix[i][j]=int(matrix[i][j])
     return newMatrix
 
+def propagationSim(wind, temp, precip, pm):
+    global results, czynnikiAtm, fig
+    if pm==10:
+        results = readcsv('../data_csv/pm10_prop.csv')
+        print("propagation = 5h, pm=10")
+    elif pm==25: 
+        results = readcsv('../data_csv/pm25_prop.csv')
+        print("propagation = 5h, pm=25")
+    
+    results = matrixToInt(results);
+    #Podzielenie wiatru na predkosc i kierunek
+    windSp,windDir = wind[:2], wind[2:]
+    for i in range (0,5):
+        czynnikiAtm.append([temp,int(windSp),windDir,precip,90,1000])
+        i = i+1
+    frames = 5
+    
+    #uruchomienie 'propagation': funkcja generuje na podstawie podanych wartosci
+    #smogu oraz czynnikow atmosferycznych kolejne wartosci z nastepnych godzinach
+    results = propagation.propagation(czynnikiAtm, results)
+    print(results)
+    
+    plt.grid()
+    ani = FuncAnimation(fig, updateSim, frames = frames, interval=300, repeat = False)
+    plt.show()
+    plt.close(fig)
+    
+    
 def main(pm,okres):
     global results, czynnikiAtm, fig
 
     if okres==7 and pm==10:
-        results = readcsv("pm10_tydzien.csv")  #zmiana pliku z danymi pomiarowymi
+        results = readcsv('../data_csv/pm10_tydzien.csv')  #zmiana pliku z danymi pomiarowymi
         print("okres = 7 tydzien, pm = 10")
     elif okres==7 and pm==25:
-        results = readcsv("pm25_tydzien.csv")
+        results = readcsv('../data_csv/pm25_tydzien.csv')
         print("okres = 7 tydzien, pm = 2.5")
     elif okres==24 and pm==10:
-        results = readcsv("pm10_dzien.csv")
+        results = readcsv('../data_csv/pm10_dzien.csv')
         print("okres = 24 dzien, pm = 10")
     elif okres==24 and pm==25:
-        results = readcsv("pm25_dzien.csv")
+        results = readcsv('../data_csv/pm25_dzien.csv')
         print("okres = 24 dzien, pm = 2.5")
     
     results = matrixToInt(results);
 
     if okres == 7:
-        czynnikiAtm = readcsv("warunki_tydzien.csv")
+        czynnikiAtm = readcsv('../data_csv/warunki_tydzien.csv')
         frames=12
     else:
-        czynnikiAtm = readcsv("warunki_dzien.csv")
+        czynnikiAtm = readcsv('../data_csv/warunki_dzien.csv')
         frames=24
     plt.grid()
     

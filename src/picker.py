@@ -41,7 +41,7 @@ class Picker(tk.Frame):
             prec = tk.IntVar()
             
             win.prompt3 = tk.Label(win, text="Start a 5h propagation with:", anchor="center")
-            win.windPrompt = tk.Label(win, text="Wind[kt](format: 5E):")
+            win.windPrompt = tk.Label(win, text="Wind[kt](format:05E):")
             win.wind = tk.Entry(win, bd =3, textvariable=w)
             win.tempPrompt = tk.Label(win, text="Temperature[*C]:")
             win.temperature = tk.Entry(win, bd =3, textvariable=temp)
@@ -57,7 +57,10 @@ class Picker(tk.Frame):
                 print(temp)
                 print(prec)
                 win.destroy()
-                #i tu by wywolywalo jakas funkcje do odpalania propagacji (jak w symulacji)
+                #Wywoluje funkcje z main, ktora liczy brakujace dane i uruchamia propagacje
+                main.propagationSim(w, temp, prec, 10)
+                #TODO: wybor typu pm dla propagacji, na razie przyjmuje 10 po prostu, ale tam
+                #trzeba radiobutton dolozyc jeszcze
                 
             win.startProp = tk.Button(win, text="Start propagation", command=propagateStart) #command
             
@@ -99,7 +102,7 @@ class Picker(tk.Frame):
         
         self.start.pack()
     
-        self.propagate.pack()
+        self.propagate.pack(fill="x")
 
 if __name__ == "__main__":
     root = tk.Tk()
