@@ -10,7 +10,7 @@ import csv
 import propagation
 
 
-#globalne:
+#zmienne globalne:
 results= []
 rownum =0
 czynnikiAtm=[]
@@ -21,7 +21,6 @@ img = plt.imread('../images/krk_color_scaled.png')
    
 #algorytm SimpleKriging
 #zrodlo: https://sourceforge.net/p/geoms2/wiki/Kriging/
-
 def SimpleKriging(x,y,v,variogram,grid):
 
     cov_angles = np.zeros((x.shape[0],x.shape[0]))
@@ -54,7 +53,7 @@ def retY(): #Zwraca punkty pomiarowe  a osi y
     y = array([50, 42, 25, 24, 20, 21, 17, 33, 34, 38, 25])
     return y
 
-def updateV(): #updatuje nowe wartosci smogu
+def updateV(): #aktualizuje nowe wartosci smogu
     #v = np.random.randint(0,100,11)  #dla losowych
     global results
     global rownum
@@ -62,7 +61,7 @@ def updateV(): #updatuje nowe wartosci smogu
     rownum +=1
     return array(v)  
     
-def update(i): #Pobiera nowa wartosc smogu, ponownie stosuje algorytm Kriging i rysuje nowy wykres
+def update(i): #Pobiera nowa wartosc smogu, ponownie stosuje algorytm Kriging i rysuje nowy wykres (dla danych rzeczywistych)
     global img, fig, czynnikiAtm
     x=retX()
     y=retY()
@@ -79,6 +78,7 @@ def update(i): #Pobiera nowa wartosc smogu, ponownie stosuje algorytm Kriging i 
     plt.xlim(0,grid.shape[0])
     plt.ylim(0,grid.shape[1])
 
+	#wypisanie czynników atmosferycznych
     plt.gcf().text(0.02, 0.95, "Temperature:  "\
             +czynnikiAtm[i+1][0]+"\N{DEGREE SIGN}C", fontsize=14)
     plt.gcf().text(0.40, 0.95, "Wind:  "+czynnikiAtm[i+1][1]\
@@ -91,7 +91,7 @@ def update(i): #Pobiera nowa wartosc smogu, ponownie stosuje algorytm Kriging i 
             +czynnikiAtm[i+1][5]+"hPa", fontsize=14)
     #plt.gcf().text(0.1, 0.03, "Numer ramki:  "\+str(i), fontsize=11)
 
-def updateSim(i): #Pobiera nowa wartosc smogu, ponownie stosuje algorytm Kriging i rysuje nowy wykres
+def updateSim(i): #Pobiera nowa wartosc smogu, ponownie stosuje algorytm Kriging i rysuje nowy wykres (dla danych predykcyjnych)
     global img, fig, czynnikiAtm
     x=retX()
     y=retY()
@@ -108,7 +108,7 @@ def updateSim(i): #Pobiera nowa wartosc smogu, ponownie stosuje algorytm Kriging
     plt.xlim(0,grid.shape[0])
     plt.ylim(0,grid.shape[1])
 
-def newColorMap():
+def newColorMap():		#zwraca nową skalę kolorów dla danych wartości smogu
     cdict = {'red':   ((0.0, 0.0, 0.0),
                    (0.167, 1.0, 1.0),
                    (0.5, 1.0, 1.0),
@@ -127,7 +127,7 @@ def newColorMap():
     smogColorMap = LinearSegmentedColormap('SmogColorMap', cdict)
     return smogColorMap
 
-def readcsv(filename):
+def readcsv(filename):	#odczytanie pliku.csv
     results = []
     with open(filename) as csvfile:
         reader = csv.reader(csvfile, delimiter = ";")
@@ -135,14 +135,14 @@ def readcsv(filename):
             results.append(row)
     return results;
 
-def matrixToInt(matrix):
+def matrixToInt(matrix):		#zamiana macierzy z wartościami String na macierz z wartościami Int
     newMatrix=[[0]*len(matrix[0]) for i in range(len(matrix))]
     for i in range(0, len(matrix)):
         for j in range (0, len(matrix[0])):
             newMatrix[i][j]=int(matrix[i][j])
     return newMatrix
 
-def propagationSim(wind, temp, precip, pm):
+def propagationSim(wind, temp, precip, pm):		#symulacja propagacji wartości smogu
     global results, czynnikiAtm, fig
     if pm==10:
         results = readcsv('../data_csv/pm10_prop.csv')
@@ -200,7 +200,3 @@ def main(pm,okres):
     
     plt.show()
     plt.close(fig)
-
-#if __name__ == "__main__":
-#    main()
-
