@@ -57,6 +57,7 @@ class Picker(tk.Frame):
                 print(temp)
                 print(prec)
                 win.destroy()
+                self.destroy()
                 #Wywoluje funkcje z main, ktora liczy brakujace dane i uruchamia propagacje
                 main.propagationSim(w, temp, prec, 10)
                 

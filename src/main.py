@@ -12,7 +12,7 @@ import propagation
 #zmienne globalne:
 results= []
 rownum =0
-czynnikiAtm=[]
+atmFactors=[]
 wind=[]
 fig=plt.figure(num='Simulation')
 img = plt.imread('../images/krk_color_scaled.png') 
@@ -61,7 +61,7 @@ def updateV(): #aktualizuje nowe wartosci smogu
     return array(v)  
     
 def update(i): #Pobiera nowa wartosc smogu, ponownie stosuje algorytm Kriging i rysuje nowy wykres (dla danych rzeczywistych)
-    global img, fig, czynnikiAtm
+    global img, fig, atmFactors
     x=retX()
     y=retY()
     v = updateV()
@@ -79,18 +79,18 @@ def update(i): #Pobiera nowa wartosc smogu, ponownie stosuje algorytm Kriging i 
 
 	#wypisanie czynników atmosferycznych
     plt.gcf().text(0.02, 0.95, "Temperature:  "\
-            +czynnikiAtm[i+1][0]+"\N{DEGREE SIGN}C", fontsize=14)
-    plt.gcf().text(0.40, 0.95, "Wind:  "+czynnikiAtm[i+1][1]\
-            +"kt "+czynnikiAtm[i+1][2], fontsize=14)
-    plt.gcf().text(0.65, 0.95, "Precipitation:  "+czynnikiAtm[i+1][3]\
+            +atmFactors[i+1][0]+"\N{DEGREE SIGN}C", fontsize=14)
+    plt.gcf().text(0.40, 0.95, "Wind:  "+atmFactors[i+1][1]\
+            +"kt "+atmFactors[i+1][2], fontsize=14)
+    plt.gcf().text(0.65, 0.95, "Precipitation:  "+atmFactors[i+1][3]\
             +"mm", fontsize=14)
-    plt.gcf().text(0.20, 0.9, "Air humidity:  "+czynnikiAtm[i+1][4]\
+    plt.gcf().text(0.20, 0.9, "Air humidity:  "+atmFactors[i+1][4]\
             +"%", fontsize=14)
     plt.gcf().text(0.58, 0.9, "Air pressure:  "\
-            +czynnikiAtm[i+1][5]+"hPa", fontsize=14)
+            +atmFactors[i+1][5]+"hPa", fontsize=14)
     
 def updateSim(i): #Pobiera nowa wartosc smogu, ponownie stosuje algorytm Kriging i rysuje nowy wykres (dla danych predykcyjnych)
-    global img, fig, czynnikiAtm
+    global img, fig, atmFactors
     x=retX()
     y=retY()
     v = updateV()
@@ -142,7 +142,7 @@ def matrixToInt(matrix):		#zamiana macierzy z wartościami String na macierz z w
     return newMatrix
 
 def propagationSim(wind, temp, precip, pm):		#symulacja propagacji wartości smogu
-    global results, czynnikiAtm, fig
+    global results, atmFactors, fig
     if pm==10:
         results = readcsv('../data_csv/pm10_prop.csv')
         print("propagation = 5h, pm=10")
@@ -154,13 +154,13 @@ def propagationSim(wind, temp, precip, pm):		#symulacja propagacji wartości smo
     #Podzielenie wiatru na predkosc i kierunek
     windSp,windDir = wind[:2], wind[2:]
     for i in range (0,5):
-        czynnikiAtm.append([temp,int(windSp),windDir,precip,90,1000])
+        atmFactors.append([temp,int(windSp),windDir,precip,90,1000])
         i = i+1
     frames = 5
     
     #uruchomienie 'propagation': funkcja generuje na podstawie podanych wartosci
     #smogu oraz czynnikow atmosferycznych kolejne wartosci z nastepnych godzinach
-    results = propagation.propagation(czynnikiAtm, results)
+    results = propagation.propagation(atmFactors, results)
     print(results)
     
     plt.grid()
@@ -168,29 +168,29 @@ def propagationSim(wind, temp, precip, pm):		#symulacja propagacji wartości smo
     plt.show()
     plt.close(fig)
     
-def mainSim(pm,okres):                                  #symulacja rzeczywistych wartosci smogu
-    global results, czynnikiAtm, fig
+def mainSim(pm,period):                                  #symulacja rzeczywistych wartosci smogu
+    global results, atmFactors, fig
 
-    if okres==7 and pm==10:
-        results = readcsv('../data_csv/pm10_tydzien.csv')  #zmiana pliku z danymi pomiarowymi
-        print("okres = 7 tydzien, pm = 10")
-    elif okres==7 and pm==25:
-        results = readcsv('../data_csv/pm25_tydzien.csv')
-        print("okres = 7 tydzien, pm = 2.5")
-    elif okres==24 and pm==10:
-        results = readcsv('../data_csv/pm10_dzien.csv')
-        print("okres = 24 dzien, pm = 10")
-    elif okres==24 and pm==25:
-        results = readcsv('../data_csv/pm25_dzien.csv')
-        print("okres = 24 dzien, pm = 2.5")
+    if period==7 and pm==10:
+        results = readcsv('../data_csv/pm10_week.csv')  #zmiana pliku z danymi pomiarowymi
+        print("period = 7 tydzien, pm = 10")
+    elif period==7 and pm==25:
+        results = readcsv('../data_csv/pm25_week.csv')
+        print("period = 7 tydzien, pm = 2.5")
+    elif period==24 and pm==10:
+        results = readcsv('../data_csv/pm10_day.csv')
+        print("period = 24 dzien, pm = 10")
+    elif period==24 and pm==25:
+        results = readcsv('../data_csv/pm25_day.csv')
+        print("period = 24 dzien, pm = 2.5")
     
     results = matrixToInt(results);
 
-    if okres == 7:
-        czynnikiAtm = readcsv('../data_csv/warunki_tydzien.csv')
+    if period == 7:
+        atmFactors = readcsv('../data_csv/factors_week.csv')
         frames=12
     else:
-        czynnikiAtm = readcsv('../data_csv/warunki_dzien.csv')
+        atmFactors = readcsv('../data_csv/factors_day.csv')
         frames=24
     plt.grid()
     
