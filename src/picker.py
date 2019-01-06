@@ -22,7 +22,7 @@ class Picker(tk.Frame):
             self.destroy()
             print(pm.get())
             print(timeR.get())
-            main.main(pm.get(),timeR.get())
+            main.mainSim(pm.get(),timeR.get())
 
         tk.Frame.__init__(self, parent)
         #tworzy przyciski wyboru i prompty
@@ -59,11 +59,9 @@ class Picker(tk.Frame):
                 win.destroy()
                 #Wywoluje funkcje z main, ktora liczy brakujace dane i uruchamia propagacje
                 main.propagationSim(w, temp, prec, 10)
-                #TODO: wybor typu pm dla propagacji, na razie przyjmuje 10 po prostu, ale tam
-                #trzeba radiobutton dolozyc jeszcze
                 
             win.startProp = tk.Button(win, text="Start propagation", command=propagateStart) #command
-            
+        
             #Umieszcza przyciski i text w oknie
             win.prompt3.pack(fill="x")
             win.windPrompt.pack(side="top")
@@ -109,4 +107,3 @@ if __name__ == "__main__":
     root.title("Air Pollution Simulation")
     Picker(root).pack(fill="both", expand=True)
     root.mainloop()
-    

@@ -9,13 +9,12 @@ from matplotlib.animation import FuncAnimation
 import csv
 import propagation
 
-
 #zmienne globalne:
 results= []
 rownum =0
 czynnikiAtm=[]
 wind=[]
-fig=plt.figure()
+fig=plt.figure(num='Simulation')
 img = plt.imread('../images/krk_color_scaled.png') 
 
    
@@ -89,8 +88,7 @@ def update(i): #Pobiera nowa wartosc smogu, ponownie stosuje algorytm Kriging i 
             +"%", fontsize=14)
     plt.gcf().text(0.58, 0.9, "Air pressure:  "\
             +czynnikiAtm[i+1][5]+"hPa", fontsize=14)
-    #plt.gcf().text(0.1, 0.03, "Numer ramki:  "\+str(i), fontsize=11)
-
+    
 def updateSim(i): #Pobiera nowa wartosc smogu, ponownie stosuje algorytm Kriging i rysuje nowy wykres (dla danych predykcyjnych)
     global img, fig, czynnikiAtm
     x=retX()
@@ -107,6 +105,7 @@ def updateSim(i): #Pobiera nowa wartosc smogu, ponownie stosuje algorytm Kriging
     cb.set_label('SMOG scale')
     plt.xlim(0,grid.shape[0])
     plt.ylim(0,grid.shape[1])
+   
 
 def newColorMap():		#zwraca nową skalę kolorów dla danych wartości smogu
     cdict = {'red':   ((0.0, 0.0, 0.0),
@@ -169,8 +168,7 @@ def propagationSim(wind, temp, precip, pm):		#symulacja propagacji wartości smo
     plt.show()
     plt.close(fig)
     
-    
-def main(pm,okres):
+def mainSim(pm,okres):                                  #symulacja rzeczywistych wartosci smogu
     global results, czynnikiAtm, fig
 
     if okres==7 and pm==10:
@@ -196,7 +194,7 @@ def main(pm,okres):
         frames=24
     plt.grid()
     
-    ani = FuncAnimation(fig, update, frames = frames, interval=300, repeat = False) #uruchomienie animacji, frames = 12 (dla kilku dni) lub frames=24 (dla jednego dnia)
+    ani = FuncAnimation(fig, update, frames = frames, interval=300, repeat = False) #uruchomienie animacji
     
     plt.show()
     plt.close(fig)
