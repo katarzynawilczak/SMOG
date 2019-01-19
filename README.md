@@ -7,11 +7,11 @@ Projekt SMOG realizowany w ramach ćwiczeń projektowych Modelowanie i Symulacja
 Na podstawie symulacji rzeczywistych danych pogodowych oraz pomiarów pm10 i pm2.5 określić uproszczony model propagacji zanieczyszczeń. 
 Rzeczywiste dane pogodowe pochodziły ze strony - windy.com, a poziom zanieczyszczeń - airly.com. Symulacja została przeprowadzona dla dwóch przedziałów czasowych - codziennie, co 12h przez tydzień oraz co goidzinę dla jednego konkretnego dnia. Na tej podstawie skonstruowałyśmy prosty model propagacji zanieczyszczenia na terenie centrum Krakowa, biorąc pod uwagę takie czynniki atmosferyczne jak: temperatura powietrza, opady, czy siła i kierunek wiatru. Po podaniu aktualnych danych pogodowych, propagacja przewiduje zanieczyszczenia dla następnych 5h. 
 
-### Instrukcja uruchomienia programu
+### Instrukcja uruchomienia programu (linux)
 
 Wymagania:
-*minimalna wersja python2.7 
-*zainstalowane biblioteki: tkinter, matplotlib, numpy, scipy
+- minimalna wersja python2.7 
+- zainstalowane biblioteki: tkinter, matplotlib, numpy, scipy
 
 Instalacja bibliotek
 ```
@@ -29,6 +29,11 @@ cd src
 python picker.py
 ```
 Następnie postępuj zgodnie z poleceniami w oknach i obserwuj wyniki symulacji. Generowanie kolejnych klatek może potrwać chwilę.
+
+### Instrukcja uruchomienia programu (windows)
+
+Pobierz .zip repozytorium. 
+Uruchom *AirPollutionSimulation.exe*. 
 
 ### Przykładowe wyniki symulacji 
 
