@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 """
 Created on Fri Dec 14 14:23:26 2018
@@ -39,6 +39,7 @@ class Picker(tk.Frame):
             w = tk.StringVar()
             temp = tk.IntVar()
             prec = tk.IntVar()
+            smog = tk.IntVar()
 
             win.prompt3 = tk.Label(win, text="Start a 5h propagation with:", anchor="center")
             win.windPrompt = tk.Label(win, text="Wind[kt](format:05E):")
@@ -47,19 +48,23 @@ class Picker(tk.Frame):
             win.temperature = tk.Entry(win, bd =3, textvariable=temp)
             win.precipPrompt = tk.Label(win, text="Precipitation[mm]:")
             win.precipitation = tk.Entry(win, bd =3, textvariable=prec)
+            win.smogPrompt = tk.Label(win, text="Current pm10 level[um/m2]:")
+            win.smog = tk.Entry(win, bd = 3, textvariable=smog)
 
             #Uruchamia propagacje z odpowiednimi atrybutami
             def propagateStart():
                 w = win.wind.get()
                 temp = int(win.temperature.get())
                 prec = int(win.precipitation.get())
+                smog = int(win.smog.get())
                 print(w)
                 print(temp)
                 print(prec)
+                print(smog)
                 win.destroy()
                 self.destroy()
                 #Wywoluje funkcje z main, ktora liczy brakujace dane i uruchamia propagacje
-                main.propagationSim(w, temp, prec, 10)
+                main.propagationSim(w, temp, prec, smog)
 
             win.startProp = tk.Button(win, text="Start propagation", command=propagateStart) #command
 
@@ -71,6 +76,8 @@ class Picker(tk.Frame):
             win.temperature.pack(side="top")
             win.precipPrompt.pack(side="top")
             win.precipitation.pack(side="top")
+            win.smogPrompt.pack(side="top")
+            win.smog.pack(side="top")
             win.startProp.pack()
 
 

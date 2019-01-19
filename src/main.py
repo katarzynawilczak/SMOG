@@ -134,6 +134,7 @@ def readcsv(filename):	#odczytanie pliku.csv
     with open(filename) as csvfile:
         reader = csv.reader(csvfile, delimiter = ";")
         for row in reader:
+            print(row)
             results.append(row)
     return results;
 
@@ -144,14 +145,13 @@ def matrixToInt(matrix):		#zamiana macierzy z wartosciami String na macierz z wa
             newMatrix[i][j]=int(matrix[i][j])
     return newMatrix
 
-def propagationSim(wind, temp, precip, pm):		#symulacja propagacji wartosci smogu
+def propagationSim(wind, temp, precip, smog):		#symulacja propagacji wartosci smogu
     global results, atmFactors, fig
-    if pm==10:
-        results = readcsv('../data_csv/pm10_prop.csv')
-        print("propagation = 5h, pm=10")
-    elif pm==25:
-        results = readcsv('../data_csv/pm25_prop.csv')
-        print("propagation = 5h, pm=25")
+
+    results.append([smog*1.5,smog*1.3,smog*1.1,smog,smog*0.99,smog*1.5,smog*1.3,smog*1.05,smog,smog,smog*1.6])
+    for i in range(1,6):
+        results.append([0,0,0,0,0,0,0,0,0,0,0])
+    print("propagation = 5h, pm=10")
 
     results = matrixToInt(results);
     #Podzielenie wiatru na predkosc i kierunek
