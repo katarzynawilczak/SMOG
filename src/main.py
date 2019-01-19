@@ -1,4 +1,7 @@
-from __future__ import division 
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+from __future__ import division
 from pylab import *
 import numpy as np
 import matplotlib.pyplot as plt
@@ -15,9 +18,9 @@ rownum =0
 atmFactors=[]
 wind=[]
 fig=plt.figure(num='Simulation')
-img = plt.imread('../images/krk_color_scaled.png') 
+img = plt.imread('../images/krk_color_scaled.png')
 
-   
+
 #algorytm SimpleKriging
 #zrodlo: https://sourceforge.net/p/geoms2/wiki/Kriging/
 def SimpleKriging(x,y,v,variogram,grid):
@@ -58,8 +61,8 @@ def updateV(): #aktualizuje nowe wartosci smogu
     global rownum
     v = results[rownum]
     rownum +=1
-    return array(v)  
-    
+    return array(v)
+
 def update(i): #Pobiera nowa wartosc smogu, ponownie stosuje algorytm Kriging i rysuje nowy wykres (dla danych rzeczywistych)
     global img, fig, atmFactors
     x=retX()
@@ -68,7 +71,7 @@ def update(i): #Pobiera nowa wartosc smogu, ponownie stosuje algorytm Kriging i 
     smogColorMap = newColorMap()
     fig.clf()
     plt.imshow(img, extent=[0, 75, 0, 60])
-    grid = np.zeros((75,60),dtype='float32') 
+    grid = np.zeros((75,60),dtype='float32')
     grid = SimpleKriging(x,y,v,(50,30),grid)
     plt.imshow(grid.T,origin='lower', interpolation='gaussian',cmap=smogColorMap, alpha=0.5, vmin=0, vmax=300)
     scatter = plt.scatter(x,y,c=v,cmap=smogColorMap, vmin=0, vmax=300)
@@ -77,7 +80,7 @@ def update(i): #Pobiera nowa wartosc smogu, ponownie stosuje algorytm Kriging i 
     plt.xlim(0,grid.shape[0])
     plt.ylim(0,grid.shape[1])
 
-	#wypisanie czynników atmosferycznych
+	#wypisanie czynnikow atmosferycznych
     plt.gcf().text(0.02, 0.95, "Temperature:  "\
             +atmFactors[i+1][0]+"\N{DEGREE SIGN}C", fontsize=14)
     plt.gcf().text(0.40, 0.95, "Wind:  "+atmFactors[i+1][1]\
@@ -88,7 +91,7 @@ def update(i): #Pobiera nowa wartosc smogu, ponownie stosuje algorytm Kriging i 
             +"%", fontsize=14)
     plt.gcf().text(0.58, 0.9, "Air pressure:  "\
             +atmFactors[i+1][5]+"hPa", fontsize=14)
-    
+
 def updateSim(i): #Pobiera nowa wartosc smogu, ponownie stosuje algorytm Kriging i rysuje nowy wykres (dla danych predykcyjnych)
     global img, fig, atmFactors
     x=retX()
@@ -97,7 +100,7 @@ def updateSim(i): #Pobiera nowa wartosc smogu, ponownie stosuje algorytm Kriging
     smogColorMap = newColorMap()
     fig.clf()
     plt.imshow(img, extent=[0, 75, 0, 60])
-    grid = np.zeros((75,60),dtype='float32') 
+    grid = np.zeros((75,60),dtype='float32')
     grid = SimpleKriging(x,y,v,(50,30),grid)
     plt.imshow(grid.T,origin='lower', interpolation='gaussian',cmap=smogColorMap, alpha=0.5, vmin=0, vmax=300)
     scatter = plt.scatter(x,y,c=v,cmap=smogColorMap, vmin=0, vmax=300)
@@ -105,9 +108,9 @@ def updateSim(i): #Pobiera nowa wartosc smogu, ponownie stosuje algorytm Kriging
     cb.set_label('SMOG scale')
     plt.xlim(0,grid.shape[0])
     plt.ylim(0,grid.shape[1])
-   
 
-def newColorMap():		#zwraca nową skalę kolorów dla danych wartości smogu
+
+def newColorMap():		#zwraca nowa skale kolorow dla danych wartosci smogu
     cdict = {'red':   ((0.0, 0.0, 0.0),
                    (0.167, 1.0, 1.0),
                    (0.5, 1.0, 1.0),
@@ -131,25 +134,25 @@ def readcsv(filename):	#odczytanie pliku.csv
     with open(filename) as csvfile:
         reader = csv.reader(csvfile, delimiter = ";")
         for row in reader:
+            print(row)
             results.append(row)
     return results;
 
-def matrixToInt(matrix):		#zamiana macierzy z wartościami String na macierz z wartościami Int
+def matrixToInt(matrix):		#zamiana macierzy z wartosciami String na macierz z wartosciami Int
     newMatrix=[[0]*len(matrix[0]) for i in range(len(matrix))]
     for i in range(0, len(matrix)):
         for j in range (0, len(matrix[0])):
             newMatrix[i][j]=int(matrix[i][j])
     return newMatrix
 
-def propagationSim(wind, temp, precip, pm):		#symulacja propagacji wartości smogu
+def propagationSim(wind, temp, precip, smog):		#symulacja propagacji wartosci smogu
     global results, atmFactors, fig
-    if pm==10:
-        results = readcsv('../data_csv/pm10_prop.csv')
-        print("propagation = 5h, pm=10")
-    elif pm==25: 
-        results = readcsv('../data_csv/pm25_prop.csv')
-        print("propagation = 5h, pm=25")
-    
+
+    results.append([smog*1.5,smog*1.3,smog*1.1,smog,smog*0.99,smog*1.5,smog*1.3,smog*1.05,smog,smog,smog*1.6])
+    for i in range(1,6):
+        results.append([0,0,0,0,0,0,0,0,0,0,0])
+    print("propagation = 5h, pm=10")
+
     results = matrixToInt(results);
     #Podzielenie wiatru na predkosc i kierunek
     windSp,windDir = wind[:2], wind[2:]
@@ -157,17 +160,17 @@ def propagationSim(wind, temp, precip, pm):		#symulacja propagacji wartości smo
         atmFactors.append([temp,int(windSp),windDir,precip,90,1000])
         i = i+1
     frames = 5
-    
+
     #uruchomienie 'propagation': funkcja generuje na podstawie podanych wartosci
     #smogu oraz czynnikow atmosferycznych kolejne wartosci z nastepnych godzinach
     results = propagation.propagation(atmFactors, results)
     print(results)
-    
+
     plt.grid()
     ani = FuncAnimation(fig, updateSim, frames = frames, interval=300, repeat = False)
     plt.show()
     plt.close(fig)
-    
+
 def mainSim(pm,period):                                  #symulacja rzeczywistych wartosci smogu
     global results, atmFactors, fig
 
@@ -183,7 +186,7 @@ def mainSim(pm,period):                                  #symulacja rzeczywistyc
     elif period==24 and pm==25:
         results = readcsv('../data_csv/pm25_day.csv')
         print("period = 24 dzien, pm = 2.5")
-    
+
     results = matrixToInt(results);
 
     if period == 7:
@@ -193,8 +196,8 @@ def mainSim(pm,period):                                  #symulacja rzeczywistyc
         atmFactors = readcsv('../data_csv/factors_day.csv')
         frames=24
     plt.grid()
-    
+
     ani = FuncAnimation(fig, update, frames = frames, interval=300, repeat = False) #uruchomienie animacji
-    
+
     plt.show()
     plt.close(fig)
