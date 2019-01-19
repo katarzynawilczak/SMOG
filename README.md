@@ -32,8 +32,9 @@ Następnie postępuj zgodnie z poleceniami w oknach i obserwuj wyniki symulacji.
 
 ### Instrukcja uruchomienia programu (windows)
 
-Pobierz .zip repozytorium. 
-Uruchom *AirPollutionSimulation.exe*. 
+-Pobierz .zip repozytorium. 
+-Wejdź do SMOG/src.
+-Uruchom *AirPollutionSimulation.exe*. 
 
 ### Przykładowe wyniki symulacji 
 
