@@ -11,20 +11,20 @@ import main
 class Picker(tk.Frame):
 
     def __init__(self, parent):
-
+        self.MyParent = parent
         pm=tk.IntVar()
         timeR=tk.IntVar()
-        pm.set(10)
+        pm.set(25)
         timeR.set(7)
 
         #Uruchamia symulacje z odpowiednimi parametrami
         def simulation():
-            self.destroy()
             print(pm.get())
             print(timeR.get())
+            self.MyParent.destroy()
             main.mainSim(pm.get(),timeR.get())
 
-        tk.Frame.__init__(self, parent)
+        self.frame = tk.Frame.__init__(self, parent)
         #tworzy przyciski wyboru i prompty
         def pmset(a):
             pm.set(a)
@@ -53,18 +53,22 @@ class Picker(tk.Frame):
 
             #Uruchamia propagacje z odpowiednimi atrybutami
             def propagateStart():
-                w = win.wind.get()
-                temp = int(win.temperature.get())
-                prec = int(win.precipitation.get())
-                smog = int(win.smog.get())
-                print(w)
-                print(temp)
-                print(prec)
-                print(smog)
-                win.destroy()
-                self.destroy()
-                #Wywoluje funkcje z main, ktora liczy brakujace dane i uruchamia propagacje
-                main.propagationSim(w, temp, prec, smog)
+                if (win.wind.get() == "" or win.temperature.get()=="" or win.precipitation.get()=="" or win.smog.get()==""):
+                    win.destroy()
+                    propagation()
+                else:
+                    w = win.wind.get()
+                    temp = int(win.temperature.get())
+                    prec = int(win.precipitation.get())
+                    smog = int(win.smog.get())
+                    print(w)
+                    print(temp)
+                    print(prec)
+                    print(smog)
+                    win.destroy()
+                    self.MyParent.destroy()
+                    #Wywoluje funkcje z main, ktora liczy brakujace dane i uruchamia propagacje
+                    main.propagationSim(w, temp, prec, smog)
 
             win.startProp = tk.Button(win, text="Start propagation", command=propagateStart) #command
 
@@ -82,10 +86,10 @@ class Picker(tk.Frame):
 
 
         #wybor typu pylow
-        pm = tk.IntVar()
+        pmType = tk.IntVar()
         self.prompt = tk.Label(self, text="Pick a pm type:", anchor="center")
-        self.pm10 = tk.Radiobutton(self, text="PM 10", variable=pm, value=10, command=lambda:pmset(10))
-        self.pm25 = tk.Radiobutton(self, text="PM2.5",variable=pm, value=25, command=lambda:pmset(25))
+        self.pm10 = tk.Radiobutton(self, text="PM 10", variable=pmType, value=10, command=lambda:pmset(10))
+        self.pm25 = tk.Radiobutton(self, text="PM2.5",variable=pmType, value=25, command=lambda:pmset(25))
 
         #wybor czasu trwania pomiarow
         tim = tk.IntVar()
@@ -109,6 +113,7 @@ class Picker(tk.Frame):
         self.start.pack()
 
         self.propagate.pack(fill="x")
+        
 
 if __name__ == "__main__":
     root = tk.Tk()

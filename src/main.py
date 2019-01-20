@@ -198,6 +198,5 @@ def mainSim(pm,period):                                  #symulacja rzeczywistyc
     plt.grid()
 
     ani = FuncAnimation(fig, update, frames = frames, interval=300, repeat = False) #uruchomienie animacji
-
     plt.show()
     plt.close(fig)
